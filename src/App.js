@@ -7,31 +7,60 @@ class App extends React.Component {
 
   state = {
     user: null,
-    error: null,
+    userDataError: null,
+    reposError: null,
+    repos: [],
     loading: false
+  };
+
+  fetchUserData = async (username) => {
+    const res = await fetch(`https://api.github.com/users/${username}`)
+
+    if (res.ok) {
+      const data = await res.json()
+      return { data }
+    }
+     const error = (await res.json()).message;
+     return {error}
   }
 
-  fetchUserData = async username => {
+  fetchRepos = async (username) => {
+    const res = await fetch(`https://api.github.com/users/${username}/repos?page=1`)
+
+    if (res.ok) {
+      const data = await res.json()
+      return { data }
+    }
+     const error = (await res.json()).message;
+     return {error}
+  }
+
+
+  fetchData = async username => {
+
+    const [user, repos] = await Promise.all([
+      this.fetchUserData(username),
+      this.fetchRepos(username)
+    ])
+    
+
+    if (user.data !== undefined && repos.data !== undefined) {
+     return this.setState({
+        user: user.data,
+        repos: repos.data,
+        loading: false
+      })
+    }
+
     this.setState({
       loading: true
     }, async () => {
 
        try {
-      const res = await fetch(`https://api.github.com/users/${username}`)
-
-      if (res.ok) {
-        const data = await res.json()
-
-        return this.setState({
-          user: data,
-          loading: false
-        })
-      }
-
-       const error = (await res.json()).message;
-
+     
       this.setState({
-        error,
+        userDataError: user.error,
+        reposError: repos.error,
         loading: false
       })
 
@@ -41,22 +70,24 @@ class App extends React.Component {
       })
     }
 
-    })
-   
-
-  
+    })  
   }
 
   render(){
-    const { error , loading, user} = this.state;
+    const { userDataError, reposError , loading, user} = this.state;
     return (
 
       <div>
-           <Search fetchData={this.fetchUserData} />
+           <Search fetchData={this.fetchData} />
+          <div className='container'>
            <div className='text-center pt-5'> 
              {loading && <p>Loading User Data......</p>}
-             {error && <p className='text-danger'>{error}</p>}
-             {!loading && !error && user && <UserCard user={user}/>}
+             {userDataError && <p className='text-danger'>{userDataError}</p>}
+             <div/>
+             {!loading && !userDataError && user && <UserCard user={user}/>}
+
+             {reposError && <p className='text-danger'>{reposError}</p>}
+           </div>
            </div>
       </div>
 
