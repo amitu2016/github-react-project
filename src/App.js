@@ -2,6 +2,7 @@ import './App.css';
 import React from 'react';
 import Search from './components/Search';
 import UserCard from './components/UserCard';
+import RepoCard from './components/RepoCard';
 
 class App extends React.Component {
 
@@ -74,7 +75,7 @@ class App extends React.Component {
   }
 
   render(){
-    const { userDataError, reposError , loading, user} = this.state;
+    const { userDataError, reposError , loading, user, repos} = this.state;
     return (
 
       <div>
@@ -87,6 +88,8 @@ class App extends React.Component {
              {!loading && !userDataError && user && <UserCard user={user}/>}
 
              {reposError && <p className='text-danger'>{reposError}</p>}
+
+             {!loading && !reposError && repos.map(repo => <RepoCard key={repo.id} repo={repo} />)}
            </div>
            </div>
       </div>
