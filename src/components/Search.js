@@ -19,6 +19,12 @@ class Search extends React.Component{
         const {username} = this.state;
 
         return ( <div className="bg-dark">
+          <div className="col-8 offset-2 text-center rr"><h1>Github Explorer App</h1></div>
+          <style>{"\
+        .rr{\
+          color:red;\
+        }\
+      "}</style>
         <div className="container py-5">
           <div className="row">
             <div className="col-8 offset-2 text-center">
